@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giải mã mật mã hiện sinh</title>
+<style>
+:root {
+  --blue:#2563eb;
+  --purple:#7c3aed;
+  --ink:#172554;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(135deg,#dff6ff,#eee8ff,#fff4d6);
+  min-height:100vh;
+  padding:24px;
+}
+.wrap {max-width:850px;margin:auto}
+.top {display:flex;justify-content:space-between;margin-bottom:18px;gap:10px}
+.pill {
+  background:white;padding:10px 16px;border-radius:30px;
+  font-weight:bold;color:#4338ca;
+}
+.card {
+  background:#ffffffed;border-radius:25px;padding:35px;
+  box-shadow:0 18px 55px #33415520;
+}
+h1 {font-size:clamp(2rem,6vw,3.4rem);color:#312e81}
+h2 {font-size:clamp(1.4rem,4vw,2rem)}
+p,li {line-height:1.7;color:#475569}
+.eyebrow {font-weight:bold;color:#0891b2;letter-spacing:2px}
+button {
+  border:0;border-radius:14px;padding:14px 20px;
+  font-size:16px;font-weight:bold;cursor:pointer;
+}
+.primary {
+  background:linear-gradient(100deg,var(--blue),var(--purple));
+  color:white;
+}
+.secondary {background:#e0e7ff;color:#3730a3}
+.option {
+  display:block;width:100%;text-align:left;margin:10px 0;
+  background:#f1f5f9;color:#1e293b;padding:16px;
+  border:2px solid transparent;
+}
+.option:hover,.option.selected {border-color:#6366f1;background:#e0e7ff}
+.option.correct {border-color:#16a34a;background:#dcfce7}
+.option.wrong {border-color:#ef4444;background:#fee2e2}
+.actions {display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.meta {display:flex;justify-content:space-between;margin-bottom:15px;font-weight:bold}
+.bar {height:9px;background:#e2e8f0;border-radius:20px;margin:15px 0 25px}
+.bar div {height:100%;background:linear-gradient(90deg,#06b6d4,#7c3aed);width:0}
+.feedback {padding:15px;border-radius:14px;margin-top:15px;line-height:1.6}
+.good {background:#dcfce7;color:#166534}
+.bad {background:#fee2e2;color:#991b1b}
+.timer {color:#7c3aed}
+.scenario {background:#f5f3ff;border-left:5px solid #8b5cf6;padding:18px;line-height:1.7}
+.code {font-size:clamp(2rem,9vw,4rem);font-weight:900;color:#6d28d9;text-align:center;margin:25px 0}
+.hidden {display:none!important}
+.footer {text-align:center;color:#64748b;margin:20px;font-size:14px}
+@media(max-width:560px) {
+  body {padding:12px}
+  .card {padding:22px}
+  .top {flex-direction:column}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<div class="top">
+  <div class="pill">🎮 TRÒ CHƠI TƯƠNG TÁC</div>
+  <div class="pill" id="stage">Sẵn sàng khám phá</div>
+</div>
+
+<main class="card">
+
+<section id="intro">
+  <div class="eyebrow">HÀNH TRÌNH KHÁM PHÁ TRIẾT HỌC</div>
+  <h1>GIẢI MÃ<br>MẬT MÃ HIỆN SINH</h1>
+  <p>
+    Khám phá những tư tưởng cốt lõi của chủ nghĩa hiện sinh
+    qua câu hỏi kiến thức, tình huống thực tế và thử thách
+    giải mã cuối cùng.
+  </p>
+  <p><b>Luật chơi:</b> Cả lớp cùng tham gia. Chọn đáp án,
+  suy nghĩ và thảo luận. Không chia đội, không xếp hạng.</p>
+  <div class="actions">
+    <button class="primary" onclick="startGame()">BẮT ĐẦU 🚀</button>
+  </div>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="meta">
+    <span id="round"></span>
+    <span class="timer" id="timer">⏱ 15 giây</span>
+  </div>
+  <div class="bar"><div id="progress"></div></div>
+  <div class="eyebrow" id="qnum"></div>
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <div id="feedback" class="hidden"></div>
+  <div class="actions">
+    <button class="primary" id="check" onclick="checkAnswer()" disabled>
+      KIỂM TRA
+    </button>
+    <button class="primary hidden" id="next" onclick="nextQuestion()">
+      CÂU TIẾP THEO →
+    </button>
+  </div>
+</section>
+
+<section id="scenario" class="hidden">
+  <div class="eyebrow">VÒNG 3 · THỬ THÁCH TÌNH HUỐNG</div>
+  <h2>Đứng trước lựa chọn của chính mình</h2>
+
+  <div class="scenario">
+    Một sinh viên luôn sống theo kỳ vọng của gia đình và xã hội.
+    Bạn ấy chưa từng tự hỏi bản thân thực sự muốn gì.
+    Khi đứng trước ngưỡng cửa tương lai, bạn ấy phải tự quyết
+    định con đường của mình.
+  </div>
+
+  <p><b>Cùng thảo luận:</b></p>
+  <ol>
+    <li>Sinh viên này đang đối diện với vấn đề gì?</li>
+    <li>Bạn ấy cần làm gì để thể hiện quyền tự do của bản thân?</li>
+    <li>Vì sao tự do luôn đi kèm trách nhiệm?</li>
+  </ol>
+
+  <p>Gợi ý: Hãy suy nghĩ về tự do lựa chọn, áp lực từ bên ngoài
+  và trách nhiệm với hệ quả của quyết định.</p>
+
+  <div class="meta">
+    <span>Thời gian thảo luận</span>
+    <span class="timer" id="scenarioTimer">⏱ 60 giây</span>
+  </div>
+
+  <div class="actions">
+    <button class="secondary" onclick="toggleHint()">HIỆN GỢI Ý</button>
+    <button class="primary" onclick="showCode()">MỞ MẬT MÃ CUỐI →</button>
+  </div>
+
+  <p id="hint" class="feedback good hidden">
+    Con người cần tự suy nghĩ, cân nhắc và lựa chọn con đường
+    phù hợp; đồng thời chịu trách nhiệm về hệ quả từ lựa chọn ấy.
+  </p>
+</section>
+
+<section id="code" class="hidden">
+  <div class="eyebrow">VÒNG CUỐI · GIẢI MÃ</div>
+  <h2>Điều gì góp phần làm nên con người theo quan điểm hiện sinh?</h2>
+  <p>Hãy suy nghĩ về vai trò chủ động của mỗi cá nhân
+  trong việc định hình cuộc đời mình.</p>
+
+  <div class="code">SỰ _ _ _ _ _ _ _</div>
+  <p style="text-align:center">
+    Gợi ý: Điều mỗi người thực hiện khi đứng trước nhiều con đường.
+  </p>
+
+  <div class="actions" style="justify-content:center">
+    <button class="primary" onclick="reveal()">GIẢI MÃ ĐÁP ÁN</button>
+  </div>
+
+  <div id="answer" class="hidden">
+    <div class="code">SỰ LỰA CHỌN</div>
+    <p style="text-align:center">
+      Chính những lựa chọn và trách nhiệm của mình góp phần
+      tạo nên con người và ý nghĩa cuộc đời.
+    </p>
+    <div class="actions" style="justify-content:center">
+      <button class="primary" onclick="finish()">HOÀN THÀNH 🎉</button>
+    </div>
+  </div>
+</section>
+
+<section id="end" class="hidden" style="text-align:center">
+  <div class="eyebrow">BẠN ĐÃ HOÀN THÀNH HÀNH TRÌNH</div>
+  <h1>🎉 XIN CHÚC MỪNG!</h1>
+  <p style="font-size:1.15rem">
+    “TỰ DO ĐỂ LỰA CHỌN –<br>
+    TRÁCH NHIỆM VỚI ĐIỀU MÌNH CHỌN.”
+  </p>
+  <p>Con người không chỉ tồn tại, mà còn chủ động
+  kiến tạo ý nghĩa cho cuộc đời mình.</p>
+  <button class="primary" onclick="location.reload()">CHƠI LẠI ↻</button>
+</section>
+
+</main>
+
+<div class="footer">
+  Chủ đề: Trường phái triết học hiện sinh · Cả lớp cùng tham gia
+</div>
+</div>
+
+<script>
+const questions = [
+{
+ round:"VÒNG 1 · TRUY TÌM TRI THỨC",
+ q:"Ai là một trong những người đặt nền móng cho chủ nghĩa hiện sinh?",
+ a:["Jean-Paul Sartre","Søren Kierkegaard","Albert Camus"],
+ c:1,
+ e:"Søren Kierkegaard thường được xem là một trong những người đặt nền móng cho tư tưởng hiện sinh."
+},
+{
+ round:"VÒNG 1 · TRUY TÌM TRI THỨC",
+ q:"Luận điểm nổi tiếng gắn với Jean-Paul Sartre là gì?",
+ a:["Bản chất có trước hiện hữu","Hiện hữu có trước bản chất","Con người không có tự do"],
+ c:1,
+ e:"Theo Sartre, con người hiện hữu trước, rồi thông qua lựa chọn và hành động mà tự tạo nên bản chất của mình."
+},
+{
+ round:"VÒNG 1 · TRUY TÌM TRI THỨC",
+ q:"Chủ nghĩa hiện sinh tập trung nghiên cứu vấn đề nào?",
+ a:["Sự tồn tại của con người","Quy luật vật lý","Sự phát triển máy móc"],
+ c:0,
+ e:"Chủ nghĩa hiện sinh quan tâm đến sự tồn tại, tự do, lựa chọn và trách nhiệm của con người."
+},
+{
+ round:"VÒNG 1 · TRUY TÌM TRI THỨC",
+ q:"Ai gắn liền với tư tưởng về cái phi lý?",
+ a:["Karl Marx","Albert Camus","Platon"],
+ c:1,
+ e:"Albert Camus nổi tiếng với tư tưởng về cái phi lý trong thân phận con người."
+},
+{
+ round:"VÒNG 2 · NHẬN DIỆN TƯ TƯỞNG",
+ q:"Một người tự quyết định ngành học mình yêu thích. Điều này thể hiện điều gì?",
+ a:["Sự tự do lựa chọn","Sự phụ thuộc","Sự né tránh trách nhiệm"],
+ c:0,
+ e:"Tự do lựa chọn là một chủ đề quan trọng của chủ nghĩa hiện sinh."
+},
+{
+ round:"VÒNG 2 · NHẬN DIỆN TƯ TƯỞNG",
+ q:"Khi đã đưa ra một quyết định, con người cần làm gì?",
+ a:["Đổ lỗi cho người khác","Chịu trách nhiệm với lựa chọn của mình","Không quan tâm đến kết quả"],
+ c:1,
+ e:"Tự do luôn đi kèm trách nhiệm đối với những gì ta lựa chọn và thực hiện."
+},
+{
+ round:"VÒNG 2 · NHẬN DIỆN TƯ TƯỞNG",
+ q:"Một sinh viên thất bại trong học tập nhưng quyết tâm cố gắng và thay đổi bản thân. Điều này thể hiện điều gì?",
+ a:["Sự buông xuôi","Sự trốn tránh","Khả năng tự xây dựng bản thân"],
+ c:2,
+ e:"Con người có khả năng định hình bản thân thông qua hành động và lựa chọn."
+},
+{
+ round:"VÒNG 2 · NHẬN DIỆN TƯ TƯỞNG",
+ q:"Theo tinh thần hiện sinh, ai có vai trò quan trọng trong việc tạo nên ý nghĩa cuộc đời của mỗi cá nhân?",
+ a:["Chính bản thân mỗi người","Bạn bè quyết định hoàn toàn","Xã hội quyết định hoàn toàn"],
+ c:0,
+ e:"Mỗi cá nhân giữ vai trò chủ động trong việc kiến tạo ý nghĩa cuộc đời mình."
+}
+];
+
+let index=0;
+let selected=null;
+let locked=false;
+let timerId=null;
+let seconds=15;
+let scenarioId=null;
+let scenarioSeconds=60;
+
+const $=id=>document.getElementById(id);
+
+function show(id) {
+ ["intro","quiz","scenario","code","end"].forEach(x=>{
+  $(x).classList.toggle("hidden",x!==id);
+ });
+}
+
+function startGame() {
+ index=0;
+ show("quiz");
+ $("stage").textContent="Vòng 1 · Vòng 2";
+ render();
+}
+
+function render() {
+ clearInterval(timerId);
+ selected=null;
+ locked=false;
+ seconds=15;
+
+ const q=questions[index];
+ $("round").textContent=q.round;
+ $("qnum").textContent=`CÂU ${index+1}/8`;
+ $("question").textContent=q.q;
+ $("progress").style.width=(index/8*100)+"%";
+ $("feedback").className="hidden";
+ $("feedback").textContent="";
+ $("check").classList.remove("hidden");
+ $("check").disabled=true;
+ $("next").classList.add("hidden");
+
+ $("options").innerHTML="";
+
+ q.a.forEach((a,i)=>{
+  let b=document.createElement("button");
+  b.className="option";
+  b.textContent=String.fromCharCode(65+i)+". "+a;
+  b.onclick=()=>choose(i,b);
+  $("options").appendChild(b);
+ });
+
+ updateTimer();
+
+ timerId=setInterval(()=>{
+  seconds--;
+  updateTimer();
+
+  if(seconds<=0) {
+   clearInterval(timerId);
+   if(!locked) {
+    locked=true;
+    revealAnswer(false);
+   }
+  }
+ },1000);
+}
+
+function updateTimer() {
+ $("timer").textContent="⏱ "+seconds+" giây";
+}
+
+function choose(i,b) {
+ if(locked)return;
+ selected=i;
+
+ document.querySelectorAll(".option").forEach(x=>{
+  x.classList.remove("selected");
+ });
+
+ b.classList.add("selected");
+ $("check").disabled=false;
+}
+
+function checkAnswer() {
+ if(selected===null||locked)return;
+ locked=true;
+ clearInterval(timerId);
+ revealAnswer(true);
+}
+
+function revealAnswer(clicked) {
+ const q=questions[index];
+
+ document.querySelectorAll(".option").forEach((b,i)=>{
+  b.disabled=true;
+  if(i===q.c)b.classList.add("correct");
+  else if(i===selected)b.classList.add("wrong");
+ });
+
+ const ok=selected===q.c;
+
+ $("feedback").className="feedback "+(ok?"good":"bad");
+
+ $("feedback").textContent=
+  (clicked?(ok?"Chính xác! ":"Chưa chính xác. "):"Hết giờ! ")
+  +q.e;
+
+ $("check").classList.add("hidden");
+ $("next").classList.remove("hidden");
+
+ $("next").textContent=
+  index===7?"ĐẾN VÒNG TÌNH HUỐNG →":"CÂU TIẾP THEO →";
+}
+
+function nextQuestion() {
+ index++;
+
+ if(index<questions.length)render();
+ else startScenario();
+}
+
+function startScenario() {
+ show("scenario");
+ $("stage").textContent="Vòng 3 · Tình huống";
+
+ scenarioSeconds=60;
+ updateScenarioTimer();
+
+ clearInterval(scenarioId);
+
+ scenarioId=setInterval(()=>{
+  scenarioSeconds--;
+  updateScenarioTimer();
+
+  if(scenarioSeconds<=0)clearInterval(scenarioId);
+ },1000);
+}
+
+function updateScenarioTimer() {
+ $("scenarioTimer").textContent="⏱ "+scenarioSeconds+" giây";
+}
+
+function toggleHint() {
+ $("hint").classList.toggle("hidden");
+}
+
+function showCode() {
+ clearInterval(scenarioId);
+ $("stage").textContent="Vòng cuối · Giải mã";
+ show("code");
+}
+
+function reveal() {
+ $("answer").classList.remove("hidden");
+}
+
+function finish() {
+ $("stage").textContent="Hoàn thành";
+ show("end");
+}
+</script>
+</body>
+</html>
